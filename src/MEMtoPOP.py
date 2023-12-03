@@ -180,7 +180,7 @@ class Population:
     def populate(self):
         while len(self.genes) < self.population_size:
             self.genes.append(get_random_gene())
-        while len(self.members) < self.population_size:
+        while len(self.members) < len(self.genes):
             self.fitness_scores.append(0)
             self.members.append(None)
         for i, gene in enumerate(self.genes):
