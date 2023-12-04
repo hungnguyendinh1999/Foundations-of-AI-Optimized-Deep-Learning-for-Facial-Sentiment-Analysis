@@ -51,6 +51,15 @@ ANGER_LABELS_TENSOR \
 TEST_SIZE = 0.2
 
 
+def train_test_split(features_tensor, labels_tensor, test_size=0.2):
+    train_size = int(len(features_tensor) * (1 - test_size))
+
+    train_x, test_x = features_tensor[:train_size], features_tensor[train_size:]
+    train_y, test_y = labels_tensor[:train_size], labels_tensor[train_size:]
+
+    return train_x, test_x, train_y, test_y
+
+
 def fitness_function(metrics):
     return sum(metrics.values()) / len(metrics.values())
 
@@ -122,9 +131,53 @@ class Member:
         pass
 
     def train(self):
-        train_size = int((1 - TEST_SIZE) * len(FEATURES_TENSOR))
-        train_X, test_X = FEATURES_TENSOR[:train_size], FEATURES_TENSOR[train_size:]
-        train_y, test_y = LABELS_TENSOR[:train_size], LABELS_TENSOR[train_size:]
+        neutral_train_x, neutral_test_x, neutral_train_y, neutral_test_y \
+            = train_test_split(NEUTRAL_FEATURES_TENSOR, NEUTRAL_LABELS_TENSOR, TEST_SIZE)
+        happy_train_x, happy_test_x, happy_train_y, happy_test_y \
+            = train_test_split(HAPPY_FEATURES_TENSOR, HAPPY_LABELS_TENSOR, TEST_SIZE)
+        sad_train_x, sad_test_x, sad_train_y, sad_test_y \
+            = train_test_split(SAD_FEATURES_TENSOR, SAD_LABELS_TENSOR, TEST_SIZE)
+        surprise_train_x, surprise_test_x, surprise_train_y, surprise_test_y \
+            = train_test_split(SURPRISE_FEATURES_TENSOR, SURPRISE_LABELS_TENSOR, TEST_SIZE)
+        fear_train_x, fear_test_x, fear_train_y, fear_test_y \
+            = train_test_split(FEAR_FEATURES_TENSOR, FEAR_LABELS_TENSOR, TEST_SIZE)
+        disgust_train_x, disgust_test_x, disgust_train_y, disgust_test_y \
+            = train_test_split(DISGUST_FEATURES_TENSOR, DISGUST_LABELS_TENSOR, TEST_SIZE)
+        anger_train_x, anger_test_x, anger_train_y, anger_test_y \
+            = train_test_split(ANGER_FEATURES_TENSOR, ANGER_LABELS_TENSOR, TEST_SIZE)
+
+        train_X = torch.cat((
+            neutral_train_x,
+            happy_train_x,
+            sad_train_x,
+            surprise_train_x,
+            fear_train_x,
+            disgust_train_x,
+            anger_train_x), dim=0)
+        train_y = torch.cat((
+            neutral_train_y,
+            happy_train_y,
+            sad_train_y,
+            surprise_train_y,
+            fear_train_y,
+            disgust_train_y,
+            anger_train_y), dim=0)
+        test_X = torch.cat((
+            neutral_test_x,
+            happy_test_x,
+            sad_test_x,
+            surprise_test_x,
+            fear_test_x,
+            disgust_test_x,
+            anger_test_x), dim=0)
+        test_y = torch.cat((
+            neutral_test_y,
+            happy_test_y,
+            sad_test_y,
+            surprise_test_y,
+            fear_test_y,
+            disgust_test_y,
+            anger_test_y), dim=0)
 
         train_dataset = AffectnetDataset(train_X, train_y)
         test_dataset = AffectnetDataset(test_X, test_y)
