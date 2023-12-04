@@ -229,7 +229,8 @@ class Member:
             "genes": self.genes,
             "metrics": self.metrics,
             "fitness": self.fitness,
-            "training_loss": self.training_loss
+            "training_loss": self.training_loss,
+            "eval_loss": self.eval_loss
         }
         torch.save(properties, os.path.join(directory, prefix + "_properties.pt"))
         pass
@@ -237,12 +238,10 @@ class Member:
     def load(self, directory, prefix):
         if not os.path.exists(directory):
             raise FileNotFoundError("File does not exist")
-
         model_path = os.path.join(directory, prefix + "_model.pt")
         if not os.path.exists(model_path):
             raise FileNotFoundError("File does not exist")
         self.model.load_state_dict(torch.load(model_path))
-
         properties_path = os.path.join(directory, prefix + "_properties.pt")
         if not os.path.exists(properties_path):
             raise FileNotFoundError("File does not exist")
@@ -251,6 +250,7 @@ class Member:
         self.metrics = properties["metrics"]
         self.fitness = properties["fitness"]
         self.training_loss = properties["training_loss"]
+        self.eval_loss = properties["eval_loss"]
         pass
 
 
