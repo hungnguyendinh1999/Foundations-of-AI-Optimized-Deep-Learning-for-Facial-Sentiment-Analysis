@@ -253,8 +253,7 @@ class Member:
         self.eval_loss = properties["eval_loss"]
         pass
 
-
-member = Member(DEFAULT_GENES)
-member.train()
-member.save(os.path.join("..", "res", "Saves", "test"), "member_test")
-print(member.fitness)
+# member = Member(DEFAULT_GENES)
+# member.train()
+# member.save(os.path.join("..", "res", "Saves", "test"), "member_test")
+# print(member.fitness)
