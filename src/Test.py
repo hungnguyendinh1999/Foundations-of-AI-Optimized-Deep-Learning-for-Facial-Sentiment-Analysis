@@ -17,10 +17,11 @@ elif torch.backends.mps.is_available():
 face_detector = MTCNN(device)
 
 # Load emotion model
-genes = torch.load(os.path.join("..", "res", "fer2013Saves", "population", "best_member_properties.pt"))["genes"]
+genes = torch.load(os.path.join("..", "res", "fer2013Saves", "population", "best_member_properties.pt"),
+                   map_location=device)["genes"]
 emotion_model = Member(genes=genes).model
 emotion_model.load_state_dict(
-    torch.load(os.path.join("..", "res", "fer2013Saves", "population", "best_member_model.pt")))
+    torch.load(os.path.join("..", "res", "fer2013Saves", "population", "best_member_model.pt"), map_location=device))
 emotion_model.to(device)
 emotion_model.eval()
 
