@@ -1,10 +1,11 @@
 import os
+
 import torch
 import torch.nn as nn
-
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
+from tqdm import tqdm
+
 from Genes import DEFAULT_GENES
 
 device = torch.device('cpu')
@@ -14,39 +15,39 @@ elif torch.backends.mps.is_available():
     device = torch.device('mps')
 
 NEUTRAL_FEATURES_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "neutral_features.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "neutral_features.pt")).to(device)
 NEUTRAL_LABELS_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "neutral_labels.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "neutral_labels.pt")).to(device)
 
 HAPPY_FEATURES_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "happy_features.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "happy_features.pt")).to(device)
 HAPPY_LABELS_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "happy_labels.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "happy_labels.pt")).to(device)
 
 SAD_FEATURES_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "sad_features.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "sad_features.pt")).to(device)
 SAD_LABELS_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "sad_labels.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "sad_labels.pt")).to(device)
 
 SURPRISE_FEATURES_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "surprise_features.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "surprise_features.pt")).to(device)
 SURPRISE_LABELS_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "surprise_labels.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "surprise_labels.pt")).to(device)
 
 FEAR_FEATURES_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "fear_features.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "fear_features.pt")).to(device)
 FEAR_LABELS_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "fear_labels.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "fear_labels.pt")).to(device)
 
 DISGUST_FEATURES_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "disgust_features.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "disgust_features.pt")).to(device)
 DISGUST_LABELS_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "disgust_labels.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "disgust_labels.pt")).to(device)
 
 ANGER_FEATURES_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "anger_features.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "anger_features.pt")).to(device)
 ANGER_LABELS_TENSOR \
-    = torch.load(os.path.join("..", "res", "AffectnetData", "anger_labels.pt")).to(device)
+    = torch.load(os.path.join("..", "res", "fer2013", "anger_labels.pt")).to(device)
 
 TEST_SIZE = 0.2
 
@@ -253,7 +254,8 @@ class Member:
         self.eval_loss = properties["eval_loss"]
         pass
 
+
 # member = Member(DEFAULT_GENES)
 # member.train()
-# member.save(os.path.join("..", "res", "Saves", "test"), "member_test")
+# member.save(os.path.join("..", "res", "fer2013Saves", "test"), "member_test")
 # print(member.fitness)

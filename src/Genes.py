@@ -1,6 +1,8 @@
+import random
+
 import torch.nn as nn
 import torch.optim as optim
-import random
+
 from Random import truncated_normal, truncated_normal_int
 
 GENE_SPACE = {
@@ -120,11 +122,12 @@ def get_random_has_batch_norm(num_hidden_layers):
 def get_random_hidden_layer_activations(num_hidden_layers):
     hidden_layer_activations = []
     for i in range(num_hidden_layers):
-        hidden_layer_activations.append(truncated_normal_int(
-            0,
-            0,
-            len(GENE_SPACE["hidden_layer_activations"]) - 1
-        ))
+        hidden_layer_activations.append(
+            GENE_SPACE["hidden_layer_activations"][truncated_normal_int(
+                0,
+                0,
+                len(GENE_SPACE["hidden_layer_activations"]) - 1
+            )])
     return hidden_layer_activations
 
 
@@ -246,6 +249,7 @@ def get_crossover_hidden_layer_activations(gene1, gene2, crossover_num_hidden_la
 def get_crossover_gene(gene1, gene2):
     crossover_gene = {
         "learning_rate": get_crossover_learning_rate(gene1, gene2),
+        "weight_decay": get_crossover_weight_decay(gene1, gene2),
         "num_epochs": get_crossover_num_epochs(gene1, gene2),
         "batch_size": get_crossover_batch_size(gene1, gene2),
         "criteria": get_crossover_criteria(gene1, gene2),
@@ -282,6 +286,14 @@ def get_mutated_num_epochs():
 
 def get_mutated_batch_size():
     return random.randint(GENE_SPACE["batch_size"][0], GENE_SPACE["batch_size"][1])
+
+
+def get_mutated_criteria():
+    return random.choice(GENE_SPACE["criteria"])
+
+
+def get_mutated_optimizer():
+    return random.choice(GENE_SPACE["optimizer"])
 
 
 def get_mutated_num_hidden_layers():
@@ -338,6 +350,12 @@ def get_mutated_gene(gene):
         return mutated_gene
     if trait == "batch_size":
         mutated_gene[trait] = get_mutated_batch_size()
+        return mutated_gene
+    if trait == "criteria":
+        mutated_gene[trait] = get_mutated_criteria()
+        return mutated_gene
+    if trait == "optimizer":
+        mutated_gene[trait] = get_mutated_optimizer()
         return mutated_gene
     if trait == "num_hidden_layers":
         mutated_gene[trait] = get_mutated_num_hidden_layers()

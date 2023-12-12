@@ -1,9 +1,11 @@
 import os
 import random
+
 import torch
 
-from Member import Member
 from Genes import get_random_gene, get_crossover_gene, get_mutated_gene
+from Member import Member
+
 
 class Population:
     def __init__(self, population_size, survival_rate, mutation_rate, save_path):
@@ -47,16 +49,12 @@ class Population:
         pass
 
     def cull(self):
-        fitness_scores_sorted = sorted(self.fitness_scores, reverse=True)
-        survival_threshold = fitness_scores_sorted[int(self.survival_rate * len(self.genes))]
-        for i, fitness in enumerate(self.fitness_scores):
-            if fitness < survival_threshold:
-                self.genes[i] = None
-                self.members[i] = None
-                self.fitness_scores[i] = None
-        self.genes = [gene for gene in self.genes if gene is not None]
-        self.members = [member for member in self.members if member is not None]
-        self.fitness_scores = [score for score in self.fitness_scores if score is not None]
+        zipped_sorted = sorted(zip(self.genes, self.fitness_scores, self.members), key=lambda x: x[1], reverse=True)
+        self.genes, self.fitness_scores, self.members = map(list, zip(*zipped_sorted))
+        num_survivors = int(self.survival_rate * len(self.genes))
+        self.genes = self.genes[:num_survivors]
+        self.fitness_scores = self.fitness_scores[:num_survivors]
+        self.members = self.members[:num_survivors]
         print("post-culling population:", len(self.genes))
         pass
 
@@ -71,11 +69,16 @@ class Population:
         pass
 
     def mutate(self):
+        mutation_count = 0
         for i, gene in enumerate(self.genes):
+            if gene == self.best_genes:
+                continue
             if random.random() < self.mutation_rate:
                 self.genes[i] = get_mutated_gene(gene)
                 self.fitness_scores[i] = 0
                 self.members[i] = None
+                mutation_count += 1
+        print("mutations:", mutation_count)
         pass
 
     def save(self):
@@ -95,7 +98,9 @@ class Population:
         properties = torch.load(os.path.join(self.save_path, "population_properties.pt"))
         self.generation = properties["generation"]
         self.genes = properties["genes"]
-        self.best_genes = properties["best_genes"]
+
+        member_properties = torch.load(os.path.join(self.save_path, "best_member_properties.pt"))
+        self.best_genes = member_properties["genes"]
         self.best_member = Member(self.best_genes)
         self.best_member.load(os.path.join(self.save_path), "best_member")
         self.best_fitness = self.best_member.fitness
@@ -132,7 +137,7 @@ class Population:
 population = Population(
     64,
     0.5,
-    0.01,
-    os.path.join("..", "res", "Saves", "population")
+    1 / 16,
+    os.path.join("..", "res", "fer2013Saves", "population")
 )
-population.run(32)
+population.run(16, resume=True)
