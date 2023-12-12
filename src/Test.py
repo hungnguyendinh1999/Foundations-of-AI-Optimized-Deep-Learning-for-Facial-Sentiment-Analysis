@@ -40,6 +40,9 @@ def preprocess_face(face):
 
     return face_features
 
+def clamp(value, min_value, max_value):
+    return max(min_value, min(max_value, value))
+
 # Get webcam input
 cap = cv2.VideoCapture(0)
 while True:
@@ -52,13 +55,31 @@ while True:
 
     if boxes is not None:
         for box in boxes:
-            extracted_face = frame[int(box[1]):int(box[3]), int(box[0]):int(box[2])]
+            # Extract coordinates
+            x1, y1, x2, y2 = box
+
+            # Clamp the box coordinates to be within the frame
+            x1 = clamp(x1, 0, frame.shape[1])
+            y1 = clamp(y1, 0, frame.shape[0])
+            x2 = clamp(x2, 0, frame.shape[1])
+            y2 = clamp(y2, 0, frame.shape[0])
+
+            if (x2 - x1 <= 0) or (y2 - y1 <= 0):
+                continue
+
+            extracted_face = frame[int(y1):int(y2), int(x1):int(x2)]
+            if extracted_face.size == 0:
+                continue
+            
             face_tensor = preprocess_face(extracted_face)
 
             # Classify Emotion
             with torch.no_grad():
                 emotion_prediction = emotion_model(face_tensor).argmax(dim=1)
                 emotion_label = emotion_labels[emotion_prediction.item()]
+
+            text_x = clamp(int(box[0]), 0, frame.shape[1])
+            text_y = clamp(int(box[1]) - 10, 0, frame.shape[0])
 
             # Visualization: Draw box and label
             cv2.rectangle(frame, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 0, 255), 1)
