@@ -17,11 +17,11 @@ elif torch.backends.mps.is_available():
 face_detector = MTCNN(device)
 
 # Load emotion model
-genes = torch.load(os.path.join("..", "res", "fer2013Saves", "population", "best_member_properties.pt"),
+genes = torch.load(os.path.join("..", "res", "AffectnetSaves", "population", "best_member_properties.pt"),
                    map_location=device)["genes"]
 emotion_model = Member(genes=genes).model
 emotion_model.load_state_dict(
-    torch.load(os.path.join("..", "res", "fer2013Saves", "population", "best_member_model.pt"), map_location=device))
+    torch.load(os.path.join("..", "res", "AffectnetSaves", "population", "best_member_model.pt"), map_location=device))
 emotion_model.to(device)
 emotion_model.eval()
 
@@ -54,6 +54,9 @@ def clamp(value, min_value, max_value):
 
 # Get webcam input
 cap = cv2.VideoCapture(0)
+
+cv2.namedWindow('Emotion Detection', cv2.WINDOW_NORMAL)
+
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -75,6 +78,9 @@ while True:
 
             if (x2 - x1 <= 0) or (y2 - y1 <= 0):
                 continue
+
+            height, width = frame.shape[:2]
+            cv2.resizeWindow('Emotion Detection', width, height)
 
             extracted_face = frame[int(y1):int(y2), int(x1):int(x2)]
             if extracted_face.size == 0:

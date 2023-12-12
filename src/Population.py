@@ -137,7 +137,7 @@ class Population:
 population = Population(
     64,
     0.5,
-    1 / 16,
+    1 / 32,
     os.path.join("..", "res", "fer2013Saves", "population")
 )
-population.run(16, resume=True)
+population.run(32, resume=True)
