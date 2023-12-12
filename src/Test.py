@@ -7,14 +7,14 @@ from Member import Member
 from torchvision.transforms import transforms
 from PIL import Image
 
-# Initialize facenet face detector
-face_detector = MTCNN(select_largest=False, device='cuda' if torch.cuda.is_available() else 'cpu')
-
 device = torch.device('cpu')
 if torch.cuda.is_available():
     device = torch.device('cuda')
 elif torch.backends.mps.is_available():
     device = torch.device('mps')
+
+# Initialize facenet face detector
+face_detector = MTCNN(device)
 
 # Load emotion model
 genes = torch.load(os.path.join("..", "res", "fer2013Saves", "population", "best_member_properties.pt"))["genes"]
