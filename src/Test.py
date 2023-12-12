@@ -10,8 +10,13 @@ from PIL import Image
 # Initialize facenet face detector
 face_detector = MTCNN(select_largest=False, device='cuda' if torch.cuda.is_available() else 'cpu')
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
+if torch.cuda.is_available():
+    device = torch.device('cuda')
+elif torch.backends.mps.is_available():
+    device = torch.device('mps')
 
+# Load emotion model
 genes = torch.load(os.path.join("..", "res", "fer2013Saves", "population", "best_member_properties.pt"))["genes"]
 emotion_model = Member(genes=genes).model
 emotion_model.load_state_dict(
@@ -19,6 +24,7 @@ emotion_model.load_state_dict(
 emotion_model.to(device)
 emotion_model.eval()
 
+# Load facenet model for feature extraction
 facenet_model = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 NORMALIZE = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 emotion_labels = ['Anger', 'Disgust', 'Fear', 'Happiness', 'Sadness', 'Surprise', 'Neutral']
@@ -40,8 +46,10 @@ def preprocess_face(face):
 
     return face_features
 
+
 def clamp(value, min_value, max_value):
     return max(min_value, min(max_value, value))
+
 
 # Get webcam input
 cap = cv2.VideoCapture(0)
@@ -78,10 +86,7 @@ while True:
                 emotion_prediction = emotion_model(face_tensor).argmax(dim=1)
                 emotion_label = emotion_labels[emotion_prediction.item()]
 
-            text_x = clamp(int(box[0]), 0, frame.shape[1])
-            text_y = clamp(int(box[1]) - 10, 0, frame.shape[0])
-
-            # Visualization: Draw box and label
+            # Draw box and label
             cv2.rectangle(frame, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 0, 255), 1)
             cv2.putText(frame, emotion_label, (int(box[0]), int(box[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.9,
                         (0, 0, 255), 1)
